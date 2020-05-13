@@ -1,6 +1,6 @@
 # [Chi](https://github.com/go-chi/chi) logrus-logger middleware
 
-logrus-logger is a request logging middleware for Chi using Logrus logging library
+logrus-logger is a request logging middleware for Chi using [Logrus](https://github.com/sirupsen/logrus) logging library
 
 [![Documentation](https://godoc.org/github.com/chi-middleware/logrus-logger?status.svg)](https://pkg.go.dev/github.com/chi-middleware/logrus-logger)
 [![codecov](https://codecov.io/gh/chi-middleware/logrus-logger/branch/master/graph/badge.svg)](https://codecov.io/gh/chi-middleware/logrus-logger)
