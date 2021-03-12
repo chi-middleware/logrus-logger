@@ -14,7 +14,7 @@ import (
 )
 
 // Logger returns a request logging middleware
-func Logger(category string, logger *logrus.Logger) func(h http.Handler) http.Handler {
+func Logger(category string, logger logrus.FieldLogger) func(h http.Handler) http.Handler {
 	return func(h http.Handler) http.Handler {
 		fn := func(w http.ResponseWriter, r *http.Request) {
 			reqID := middleware.GetReqID(r.Context())

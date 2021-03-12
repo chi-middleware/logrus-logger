@@ -49,6 +49,25 @@ func TestLogger(t *testing.T) {
 	assert.Equal(t, "http://localhost:8080/", hook.LastEntry().Message)
 }
 
+func TestEntry(t *testing.T) {
+	req := httptest.NewRequest("GET", "/", nil)
+	req.Host = "localhost:8080"
+
+	logger, hook := test.NewNullLogger()
+	entry := logger.WithField("entry", "exists")
+
+	testRequest(t, req, Logger("router", entry))
+
+	assert.Equal(t, 1, len(hook.Entries))
+	assert.Equal(t, logrus.InfoLevel, hook.LastEntry().Level)
+	assert.Equal(t, "exists", hook.LastEntry().Data["entry"])
+	assert.Nil(t, hook.LastEntry().Data["request_id"])
+	assert.Equal(t, "GET", hook.LastEntry().Data["method"])
+	assert.Equal(t, 11, hook.LastEntry().Data["bytes"])
+	assert.Greater(t, hook.LastEntry().Data["duration"], int64(0))
+	assert.Equal(t, "http://localhost:8080/", hook.LastEntry().Message)
+}
+
 func TestLoggerRequestID(t *testing.T) {
 	req := httptest.NewRequest("GET", "/", nil)
 	req.Host = "localhost:8080"
