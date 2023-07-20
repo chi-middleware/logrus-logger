@@ -13,8 +13,12 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// Logger returns a request logging middleware
 func Logger(category string, logger logrus.FieldLogger) func(h http.Handler) http.Handler {
+	return LoggerWithLevel(category, logger, logrus.InfoLevel)
+}
+
+// Logger returns a request logging middleware
+func LoggerWithLevel(category string, logger logrus.FieldLogger, level logrus.Level) func(h http.Handler) http.Handler {
 	return func(h http.Handler) http.Handler {
 		fn := func(w http.ResponseWriter, r *http.Request) {
 			reqID := middleware.GetReqID(r.Context())
@@ -42,7 +46,7 @@ func Logger(category string, logger logrus.FieldLogger) func(h http.Handler) htt
 				if len(reqID) > 0 {
 					fields["request_id"] = reqID
 				}
-				logger.WithFields(fields).Infof("%s://%s%s", scheme, r.Host, r.RequestURI)
+				logger.WithFields(fields).Logf(level, "%s://%s%s", scheme, r.Host, r.RequestURI)
 			}()
 
 			h.ServeHTTP(ww, r)

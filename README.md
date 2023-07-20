@@ -15,11 +15,23 @@ Import using:
 import "github.com/chi-middleware/logrus-logger"
 ```
 
-Use middleware:
+Use middleware with default (Info) logging level:
 
 ```go
     log := logrus.New()
 
     r := chi.NewRouter()
     r.Use(logger.Logger("router", log))
+```
+
+or 
+
+Use middleware with Debug logging level:
+
+```go
+    log := logrus.New()
+    log.SetLevel(logrus.TraceLevel)
+
+    r := chi.NewRouter()
+    r.Use(logger.LoggerWithLevel("router", log, logrus.DebugLevel))
 ```

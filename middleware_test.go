@@ -49,6 +49,36 @@ func TestLogger(t *testing.T) {
 	assert.Equal(t, "http://localhost:8080/", hook.LastEntry().Message)
 }
 
+func TestLoggerWithLevelDebug(t *testing.T) {
+	testLoggerWithLevel(t, logrus.DebugLevel)
+}
+
+func TestLoggerWithLevelWarning(t *testing.T) {
+	testLoggerWithLevel(t, logrus.WarnLevel)
+}
+
+func TestLoggerWithLevelTrace(t *testing.T) {
+	testLoggerWithLevel(t, logrus.TraceLevel)
+}
+
+func testLoggerWithLevel(t *testing.T, level logrus.Level) {
+	req := httptest.NewRequest("GET", "/", nil)
+	req.Host = "localhost:8080"
+
+	logger, hook := test.NewNullLogger()
+	logger.SetLevel(logrus.TraceLevel)
+
+	testRequest(t, req, LoggerWithLevel("router", logger, level))
+
+	assert.Equal(t, 1, len(hook.Entries))
+	assert.Equal(t, level, hook.LastEntry().Level)
+	assert.Nil(t, hook.LastEntry().Data["request_id"])
+	assert.Equal(t, "GET", hook.LastEntry().Data["method"])
+	assert.Equal(t, 11, hook.LastEntry().Data["bytes"])
+	assert.Greater(t, hook.LastEntry().Data["duration"], int64(0))
+	assert.Equal(t, "http://localhost:8080/", hook.LastEntry().Message)
+}
+
 func TestEntry(t *testing.T) {
 	req := httptest.NewRequest("GET", "/", nil)
 	req.Host = "localhost:8080"
