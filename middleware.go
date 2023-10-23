@@ -19,6 +19,14 @@ func Logger(category string, logger logrus.FieldLogger) func(h http.Handler) htt
 
 // Logger returns a request logging middleware
 func LoggerWithLevel(category string, logger logrus.FieldLogger, level logrus.Level) func(h http.Handler) http.Handler {
+	config := NewLoggerConfigBuilder().
+		WithLoggingLevel(level).
+		Build()
+
+	return LoggerWithConfig(category, logger, config)
+}
+
+func LoggerWithConfig(category string, logger logrus.FieldLogger, config LoggerConfig) func(h http.Handler) http.Handler {
 	return func(h http.Handler) http.Handler {
 		fn := func(w http.ResponseWriter, r *http.Request) {
 			reqID := middleware.GetReqID(r.Context())
@@ -46,7 +54,10 @@ func LoggerWithLevel(category string, logger logrus.FieldLogger, level logrus.Le
 				if len(reqID) > 0 {
 					fields["request_id"] = reqID
 				}
-				logger.WithFields(fields).Logf(level, "%s://%s%s", scheme, r.Host, r.RequestURI)
+				if config.includeRequestHeaders {
+					fields["request_headers"] = r.Header
+				}
+				logger.WithFields(fields).Logf(config.level, "%s://%s%s", scheme, r.Host, r.RequestURI)
 			}()
 
 			h.ServeHTTP(ww, r)
